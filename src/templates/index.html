@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Expense Tracker</h1>
+        <p>Manage your money smarter.</p>
+    </header>
+
+    <section class="cards">
+        <div class="card balance">
+            <p>Total Balance</p>
+            <h2>${{ "%.2f"|format(balance) }}</h2>
+        </div>
+
+        <div class="card income">
+            <p>Total Income</p>
+            <h2>${{ "%.2f"|format(income) }}</h2>
+        </div>
+
+        <div class="card expense">
+            <p>Total Expenses</p>
+            <h2>${{ "%.2f"|format(expenses) }}</h2>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="form-box">
+            <h2>Add Transaction</h2>
+
+            <form action="/add" method="POST">
+                <input type="text" name="description"
+                       placeholder="Description" required>
+
+                <input type="number" name="amount"
+                       placeholder="Amount" min="0.01"
+                       step="0.01" required>
+
+                <select name="type">
+                    <option value="Income">Income</option>
+                    <option value="Expense">Expense</option>
+                </select>
+
+                <select name="category">
+                    <option>Food</option>
+                    <option>Transport</option>
+                    <option>Shopping</option>
+                    <option>Salary</option>
+                    <option>Bills</option>
+                    <option>Other</option>
+                </select>
+
+                <button type="submit">Add Transaction</button>
+            </form>
+        </div>
+
+        <div class="history">
+            <h2>Recent Transactions</h2>
+
+            {% for t in transactions %}
+            <div class="transaction">
+                <div>
+                    <strong>{{ t.description }}</strong>
+                    <p>{{ t.category }} - {{ t.type }}</p>
+                </div>
+
+                <div>
+                    <strong>
+                        {% if t.type == 'Income' %}+{% else %}-{% endif %}
+                        ${{ "%.2f"|format(t.amount) }}
+                    </strong>
+
+                    <form action="/delete/{{ t.id }}" method="POST">
+                        <button type="submit">Delete</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <p class="empty">No transactions yet.</p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+</body>
+</html>
